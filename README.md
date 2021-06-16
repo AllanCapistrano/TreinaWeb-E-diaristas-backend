@@ -12,6 +12,9 @@ O projeto trata-se de uma platafora para a contratação de diarista.
 **📊 Dependências:**
 - [Bootstrap](https://getbootstrap.com/)
 - [jQuery](http://code.jquery.com/)
+- [guzzle](https://laravel.com/docs/8.x/http-client)
+- [laravel-pt-br-localization](https://github.com/lucascudo/laravel-pt-BR-localization)
+- [php-mask](https://github.com/clemdesign/php-mask)
 
 ------------
 
