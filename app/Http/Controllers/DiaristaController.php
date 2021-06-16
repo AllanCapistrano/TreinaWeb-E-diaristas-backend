@@ -2,11 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DiaristaRequest;
 use App\Models\Diarista;
+use App\Services\ViaCEP;
 use Illuminate\Http\Request;
 
 class DiaristaController extends Controller
 {
+    public function __construct(
+        protected ViaCEP $viaCEP
+    )
+    {
+    }
+
+    /* Isso equivale a:
+        protected ViaCEP $viaCEP;
+        
+        public function __construct(ViaCEP $viaCEP)
+        {
+            $this->viaCEP = $viaCEP;
+        }
+    */
+
     /**
      * Listagem de diaristas.
      *
@@ -34,10 +51,10 @@ class DiaristaController extends Controller
     /**
      * Cria uma nova diarista.
      *
-     * @param Request $request
+     * @param DiaristaRequest $request
      * @return void
      */
-    public function store(Request $request)
+    public function store(DiaristaRequest $request)
     {
         $dados = $request->except('_token');
         $dados['foto_usuario'] = $request->foto_usuario->store('public');
@@ -46,6 +63,9 @@ class DiaristaController extends Controller
         $dados['cep'] = str_replace('-', '', $dados['cep']);
         $dados['telefone'] = str_replace(['(', ')', ' ', '-'], '', $dados['telefone']);
 
+        /*Buscando o código do IBGE através do CEP digitado e salvando no BD. */
+        $dados['codigo_ibge'] = $this->viaCEP->buscar($dados['cep'])['ibge'];
+        
         Diarista::create($dados);
 
         return redirect()->route('diaristas.index');
@@ -69,11 +89,11 @@ class DiaristaController extends Controller
     /**
      * Atualiza as informações de uma diarista.
      *
-     * @param Request $request
+     * @param DiaristaRequest $request
      * @param integer $id
      * @return void
      */
-    public function update(Request $request, int $id)
+    public function update(DiaristaRequest $request, int $id)
     {
         $diarista = Diarista::findOrFail($id);
 
@@ -89,6 +109,9 @@ class DiaristaController extends Controller
         $dados['cpf'] = str_replace(['.', '-'], '', $dados['cpf']);
         $dados['cep'] = str_replace('-', '', $dados['cep']);
         $dados['telefone'] = str_replace(['(', ')', ' ', '-'], '', $dados['telefone']);
+
+        /*Buscando o código do IBGE através do CEP digitado e salvando no BD. */
+        $dados['codigo_ibge'] = $this->viaCEP->buscar($dados['cep'])['ibge'];
 
         $diarista->update($dados);
 
